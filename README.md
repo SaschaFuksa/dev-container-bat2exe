@@ -1,0 +1,2 @@
+(1. pyinstaller --onefile --noconsole --icon="vscode.ico" start_vscode_with_docker.py)
+2. & "C:\Users\<username>\AppData\Roaming\Python\Python313\Scripts\pyinstaller.exe" --onefile --noconsole --icon="vscode+.ico" start_vscode_with_docker.py
