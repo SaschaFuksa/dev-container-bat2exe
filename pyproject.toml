@@ -8,7 +8,8 @@ dependencies = [
     "requests",
     "flask",
     "fastapi",
-    "uvicorn"
+    "uvicorn",
+    "pyinstaller"
     # --- Optional: MCP (kommentiert) ---
     # "mcp",
     # "pydantic",

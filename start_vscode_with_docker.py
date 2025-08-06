@@ -2,13 +2,32 @@ import subprocess
 import time
 
 
-def is_docker_running():
-    tasks = subprocess.check_output("tasklist", shell=True).decode()
-    return "Docker Desktop.exe" in tasks
+def run_command(command):
+    try:
+        output = subprocess.check_output(command, shell=True)
+        return output.decode("utf-8").strip()
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
 
 
-if not is_docker_running():
-    subprocess.Popen(r"C:/Program Files/Docker/Docker/Docker Desktop.exe")
+rancher_running = False
+
+if "Rancher Desktop" in run_command("tasklist"):
+    rancher_running = True
+else:
+    subprocess.run(["start", ""], check=False, shell=True)
+
     time.sleep(5)
 
-subprocess.Popen(r"C:/Users/sasch/AppData/Local/Programs/Microsoft VS Code/Code.exe")
+    while not rancher_running:
+        if "Rancher Desktop" in run_command("tasklist"):
+            rancher_running = True
+        else:
+            print("Waiting for Rancher Desktop to start...")
+            time.sleep(2)
+
+if rancher_running:
+    subprocess.run(["code"], check=False)
+else:
+    print("Rancher Desktop couldn't start.")
