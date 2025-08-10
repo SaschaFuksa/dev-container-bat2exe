@@ -1,6 +1,9 @@
 import subprocess
 import time
+import os
 
+#.\venv\Scripts\activate
+#pyinstaller --onefile --noconsole --icon=vscode+.ico start_vscode_with_docker.py
 
 def run_command(command):
     try:
@@ -10,24 +13,30 @@ def run_command(command):
         print(f"Error: {e}")
         return None
 
+def is_rancher_running():
+    return "Rancher Desktop" in run_command("tasklist")
 
-rancher_running = False
+rancher_running = is_rancher_running()
 
-if "Rancher Desktop" in run_command("tasklist"):
-    rancher_running = True
-else:
-    subprocess.run(["start", ""], check=False, shell=True)
+if not rancher_running:
+    rancher_path = r"C:\Program Files\Rancher Desktop\Rancher Desktop.exe"
+    if not os.path.exists(rancher_path):
+        print("❌ Rancher Desktop.exe not found!")
+    else:
+        subprocess.Popen(['cmd', '/c', 'start', '', rancher_path], shell=False)
+        print("🚀 Starting Rancher Desktop...")
+        start_time = time.time()
 
-    time.sleep(5)
-
-    while not rancher_running:
-        if "Rancher Desktop" in run_command("tasklist"):
-            rancher_running = True
-        else:
-            print("Waiting for Rancher Desktop to start...")
+        while not is_rancher_running():
+            if time.time() - start_time > 30:
+                print("⚠️ Timeout: Rancher Desktop did not start in time.")
+                break
+            print("⏳ Waiting for Rancher Desktop...")
             time.sleep(2)
 
-if rancher_running:
-    subprocess.run(["code"], check=False)
+if is_rancher_running():
+    time.sleep(2)
+    vscode_path = r"C:\Users\sasch\AppData\Local\Programs\Microsoft VS Code\bin\code.cmd"
+    subprocess.run([vscode_path], shell=True)
 else:
-    print("Rancher Desktop couldn't start.")
+    print("⚠️ Rancher Desktop could not be started.")
